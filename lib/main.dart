@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertest/app/core/navigation/routes.dart';
+import 'package:fluttertest/app/core/theme/themes.dart';
 import 'package:fluttertest/app/pages/auth_page.dart';
 
 void main() async {
@@ -15,10 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Technical Test',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: AuthPage(),
+      theme: Themes.mainTheme,
+      routes: routes,
     );
   }
 }

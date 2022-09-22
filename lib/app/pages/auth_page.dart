@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertest/app/core/navigation/route_name.dart';
 import 'package:fluttertest/app/data/enums/image_width.dart';
 import 'package:fluttertest/app/data/http/http_client.dart';
 import 'package:fluttertest/app/data/models/series.dart';
@@ -44,6 +45,10 @@ class AuthPage extends ConsumerWidget {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  /// Form fields controllers
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loginShow = ref.watch(loginShowProvider);
@@ -79,14 +84,9 @@ class AuthPage extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  const Text(
+                  Text(
                     'Welcome!',
-                    style: TextStyle(
-                      fontFamily: 'Gilroy',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Column(
                     children: <Widget>[
@@ -96,19 +96,6 @@ class AuthPage extends ConsumerWidget {
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.only(bottom: 16),
                         child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                              const Color(0xFFFFD233),
-                            ),
-                            foregroundColor: MaterialStateProperty.all(
-                              Colors.black,
-                            ),
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                            ),
-                          ),
                           onPressed: () {},
                           child: const Text('Sign up'),
                         ),
@@ -121,14 +108,6 @@ class AuthPage extends ConsumerWidget {
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                               Colors.white,
-                            ),
-                            foregroundColor: MaterialStateProperty.all(
-                              Colors.black,
-                            ),
-                            shape: MaterialStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                              ),
                             ),
                           ),
                           onPressed: () {
@@ -144,13 +123,6 @@ class AuthPage extends ConsumerWidget {
                           onPressed: () {},
                           child: const Text(
                             'Forgot password?',
-                            style: TextStyle(
-                              fontFamily: 'Gilroy',
-                              color: Colors.grey,
-                              decorationColor: Colors.grey,
-                              decorationThickness: 1,
-                              decoration: TextDecoration.underline,
-                            ),
                           ),
                         ),
                       ),
@@ -166,7 +138,7 @@ class AuthPage extends ConsumerWidget {
             left: 0,
             right: 0,
             child: AnimatedContainer(
-              height: loginShow ? 380 : 0,
+              height: loginShow ? 400 : 0,
               duration: const Duration(milliseconds: 300),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -175,65 +147,47 @@ class AuthPage extends ConsumerWidget {
               ),
               child: Column(
                 children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            ref.read(loginShowProvider.notifier).state = false;
-                          },
-                          icon: const Icon(Icons.close),
-                          color: Colors.grey,
-                        )
-                      ],
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      IconButton(
+                        onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          ref.read(loginShowProvider.notifier).state = false;
+                        },
+                        icon: const Icon(Icons.close),
+                        color: Colors.grey,
+                      ),
+                    ],
                   ),
                   Form(
                     key: formKey,
                     child: Column(
                       children: <Widget>[
                         TextFormField(
-                          decoration: InputDecoration(
+                          controller: nameController,
+                          decoration: const InputDecoration(
                             labelText: 'Name',
-                            labelStyle: TextStyle(
-                              color: Colors.grey.withOpacity(0.5),
-                            ),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.5),
-                              )
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.5),
-                                width: 2,
-                              ),
-                            ),
                           ),
+                          validator: (String? value) {
+                            if (value != null && value.isEmpty) {
+                              return 'This field is required';
+                            }
+                            if (value == 'maria' || value == 'pedro') {
+                              return null;
+                            }
+                            return 'Not found name: ${nameController.text} '
+                                'in our database';
+                          },
                         ),
                         TextFormField(
+                          controller: passwordController,
                           style: TextStyle(
                             color: Colors.grey.withOpacity(0.5),
                           ),
                           decoration:InputDecoration(
                             labelText: 'Password',
-                            labelStyle: TextStyle(
-                              color: Colors.grey.withOpacity(0.5),
-                            ),
                             alignLabelWithHint: true,
-                            enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey.withOpacity(0.5),
-                                )
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.5),
-                                width: 2,
-                              ),
-                            ),
                             suffix: IconButton(
                               onPressed: () {
                                 ref.read(
@@ -248,28 +202,40 @@ class AuthPage extends ConsumerWidget {
                             )
                           ),
                           obscureText: securePassword,
+                          validator: (String? value) {
+                            if (value != null && value.isEmpty) {
+                              return 'This field is required';
+                            }
+                            if (
+                              value != 'password' &&
+                              nameController.text == 'maria' ||
+                              value != '123456' &&
+                              nameController.text == 'pedro'
+                            ) {
+                              return 'Password is incorrect';
+                            }
+                            return null;
+                          },
                         ),
-                        AnimatedContainer(
-                          height: loginShow ? 36 : 0,
-                          width: loginShow ? 128 : 0,
+                        Container(
+                          height: 36,
+                          width: 128,
                           margin: const EdgeInsets.only(top: 64),
-                          duration: const Duration(milliseconds: 300),
                           child: ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all(
                                 Colors.white,
                               ),
-                              foregroundColor: MaterialStateProperty.all(
-                                Colors.black,
-                              ),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                              ),
                             ),
                             onPressed: () {
-                              ref.read(loginShowProvider.notifier).state = true;
+                              if (formKey.currentState!.validate()) {
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  RouteName.home,
+                                  (route) => false,
+                                );
+                              }
+                              return;
                             },
                             child: const Text('Log in'),
                           ),

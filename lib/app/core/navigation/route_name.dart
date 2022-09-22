@@ -4,4 +4,5 @@ class RouteName {
 
   static const String auth = '/';
   static const String home = '/auth/home';
+  static const String popularSeries = '/auth/popular/series';
 }

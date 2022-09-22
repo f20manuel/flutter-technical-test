@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertest/app/core/theme/colors.dart';
+import 'package:fluttertest/app/pages/home_page.dart';
 
 /// Themes
 class Themes {
@@ -7,6 +8,14 @@ class Themes {
 
   static ThemeData mainTheme = ThemeData(
     scaffoldBackgroundColor: CompanyColors.black,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      foregroundColor: CompanyColors.grey,
+      elevation: 0,
+      iconTheme: IconThemeData(
+        color: CompanyColors.grey,
+      ),
+    ),
     primarySwatch: CompanyColors.materialPrimary,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
@@ -58,8 +67,18 @@ class Themes {
         fontFamily: 'Gilroy',
         fontSize: 24,
         fontWeight: FontWeight.bold,
-        color: Colors.grey,
+        color: CompanyColors.grey,
       ),
-    )
+      titleSmall: TextStyle(
+        fontFamily: 'Gilroy',
+        fontSize: 16,
+        color: Colors.white,
+      ),
+    ),
+    dividerColor: CompanyColors.grey,
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.black,
+      unselectedItemColor: Colors.white,
+    ),
   );
 }

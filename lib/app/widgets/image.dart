@@ -7,24 +7,28 @@ import 'package:fluttertest/app/data/enums/image_width.dart';
 class AppNetworkImage extends StatelessWidget {
   /// App Network Image Constructor
   const AppNetworkImage({
-    required this.width,
+    required this.pathWidth,
     required this.path,
-    this.placeholder,
     Key? key,
+    this.placeholder,
+    this.width,
+    this.height,
+    this.fit,
   }) : super(key: key);
 
   final String path;
-  final ImageWidth width;
+  final ImageWidth pathWidth;
+  final double? width;
+  final double? height;
+  final BoxFit? fit;
   final PlaceholderWidgetBuilder? placeholder;
 
   @override
   Widget build(BuildContext context) => CachedNetworkImage(
-    imageUrl: '${dotenv.get('IMAGES_BASE_URL')}/${width.value}$path',
+    imageUrl: '${dotenv.get('IMAGES_BASE_URL')}/${pathWidth.value}$path',
     placeholder: placeholder,
-    width: width.value == 'original'
-      ? MediaQuery.of(context).size.width
-      : double.parse(width.value),
-    height: MediaQuery.of(context).size.height,
-    fit: width.value == 'original' ? BoxFit.cover : BoxFit.fitWidth,
+    width: width,
+    height: height,
+    fit: fit,
   );
 }

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 /// Image Width Enum
 enum ImageWidth {
-  w100,
   w200,
   w300,
   w400,

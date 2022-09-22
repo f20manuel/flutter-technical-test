@@ -10,6 +10,7 @@ class Series {
   late DateTime firstAirDate;
   late List genreIds;
   late String name;
+  late double? rate;
 
   /// Series constructor
   Series({
@@ -18,6 +19,7 @@ class Series {
     required this.firstAirDate,
     required this.genreIds,
     required this.name,
+    this.rate,
   });
 
   /// Series from json

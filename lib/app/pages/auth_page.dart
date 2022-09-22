@@ -68,8 +68,11 @@ class AuthPage extends ConsumerWidget {
             ),
             data: (Series? data) => data != null
                 ? AppNetworkImage(
-                    width: ImageWidth.original,
+                    pathWidth: ImageWidth.original,
                     path: data.backdropPath,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    fit: BoxFit.cover,
                   )
                 : Container(),
             error: (err, stack) => Text('Error: $err'),
@@ -234,6 +237,8 @@ class AuthPage extends ConsumerWidget {
                                   RouteName.home,
                                   (route) => false,
                                 );
+                                ref.read(loginShowProvider.notifier)
+                                    .state = false;
                               }
                               return;
                             },

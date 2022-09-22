@@ -1,0 +1,4 @@
+/// Details page
+class DetailsPage {
+
+}

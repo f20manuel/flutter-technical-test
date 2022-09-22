@@ -63,6 +63,12 @@ class Themes {
       ),
     ),
     textTheme: const TextTheme(
+      titleLarge: TextStyle(
+        fontFamily: 'Gilroy',
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
       titleMedium: TextStyle(
         fontFamily: 'Gilroy',
         fontSize: 24,

@@ -13,6 +13,9 @@ import 'package:skeletons/skeletons.dart';
 
 /// States
 final StateProvider<int> pageIndexProvider = StateProvider<int>((ref) => 0);
+final myFavoritesProvider = ChangeNotifierProvider<SeriesNotifier>((ref) {
+  return SeriesNotifier();
+});
 
 /// Get popular series
 final futureSeriesProvider = FutureProvider.autoDispose<List<Series>>(
@@ -72,13 +75,20 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pageIndex = ref.watch(pageIndexProvider);
+    final myFavorites = ref.watch(myFavoritesProvider).myFavorites;
     final AsyncValue<List<Series>> series = ref.watch(futureSeriesProvider);
     final AsyncValue<List<Series>> recommendations = ref.watch(
       futureSeriesProvider,
     );
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text(
+          'Home',
+          style: Theme.of(context).textTheme.titleSmall
+          ?.merge(
+            const TextStyle(color: CompanyColors.grey),
+          ),
+        ),
         actions: <Widget>[
           IconButton(
             onPressed: () => Navigator.pushNamedAndRemoveUntil(
@@ -113,14 +123,37 @@ class HomePage extends ConsumerWidget {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
-                  height: 310,
+                  height: 320,
                   child: series.when(
-                      loading: () => SkeletonListView(
-                        itemCount: 4,
-                        item: const SkeletonLine(
-                          style: SkeletonLineStyle(
-                            width: 150,
-                            height: 300,
+                      loading: () => Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: List.generate(2, (_) =>
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                    right: 16,
+                                    bottom: 8,
+                                  ),
+                                  child: SkeletonLine(
+                                    style: SkeletonLineStyle(
+                                      width: 150,
+                                      height: 200,
+                                      borderRadius: BorderRadius.circular(20),
+                                    )
+                                  ),
+                                ),
+                                SkeletonLine(
+                                  style: SkeletonLineStyle(
+                                    width: 100,
+                                    height: 18,
+                                    borderRadius: BorderRadius.circular(5),
+                                  )
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -129,9 +162,9 @@ class HomePage extends ConsumerWidget {
                         return ListView.separated(
                           scrollDirection: Axis.horizontal,
                           separatorBuilder: (BuildContext context, int index) =>
-                              Container(
-                                width: 24,
-                              ),
+                            Container(
+                              width: 24,
+                            ),
                           itemCount: data.length,
                           padding: const EdgeInsets.all(16),
                           itemBuilder: (BuildContext context, int index) {
@@ -166,11 +199,14 @@ class HomePage extends ConsumerWidget {
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    item.name,
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme
-                                        .titleSmall,
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 8),
+                                    child: Text(
+                                      item.name,
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context).textTheme
+                                          .titleSmall,
+                                    ),
                                   ),
                                   Container(
                                     margin: const EdgeInsets.only(top: 8),
@@ -245,102 +281,119 @@ class HomePage extends ConsumerWidget {
                     return Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
-                        children: data.map((Series item) => Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: AppNetworkImage(
-                                      pathWidth: ImageWidth.w300,
-                                      path: item.backdropPath,
-                                      width: 150,
-                                      height: 150,
-                                      fit: BoxFit.cover,
-                                    )
-                                  ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 16),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment
-                                            .start,
-                                        children: <Widget>[
-                                          Text(
-                                            item.name,
-                                            textAlign: TextAlign.start,
-                                            style: Theme.of(context).textTheme
-                                                .titleSmall,
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(top: 8),
-                                            child: RatingBar.builder(
-                                              initialRating: item.rate ?? 3,
-                                              itemCount: 5,
-                                              allowHalfRating: true,
-                                              itemPadding: const EdgeInsets
-                                                  .symmetric(horizontal: 1.0),
-                                              itemBuilder: (context, _) => Icon(
-                                                Icons.star_rounded,
-                                                color: CompanyColors.grey
-                                                    .withOpacity(0.7),
-                                              ),
-                                              itemSize: 12,
-                                              onRatingUpdate: (_) {},
-                                            ),
-                                          ),
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                              top: 8,
-                                              bottom: 28,
-                                            ),
-                                            child: Text(
-                                              'IMDb: ${(item.rate ?? 0 * 2)
-                                                  .toString()}',
-                                              style: Theme.of(context).textTheme
-                                                  .titleSmall
-                                              ?.merge(const TextStyle(
-                                                color: CompanyColors.grey,
-                                                fontSize: 9,
-                                              )),
-                                            ),
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment
-                                            .spaceBetween,
-                                            children: [
-                                              SizedBox(
-                                                width: 128,
-                                                height: 39,
-                                                child: ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: const Text('Watch now')
-                                                ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () {},
-                                                icon: const Icon(
-                                                  Icons.favorite_border_rounded,
-                                                ),
-                                                color: CompanyColors.grey,
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                        children: data.map((Series item) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 24),
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: AppNetworkImage(
+                                          pathWidth: ImageWidth.w300,
+                                          path: item.backdropPath,
+                                          width: 150,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                        )
                                     ),
-                                  )
-                                ],
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 16),
-                                child: Divider(),
-                              ),
-                            ],
-                          ),
-                        )).toList(),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 16),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .start,
+                                          children: <Widget>[
+                                            Text(
+                                              item.name,
+                                              textAlign: TextAlign.start,
+                                              style: Theme.of(context).textTheme
+                                                  .titleSmall,
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(top: 8),
+                                              child: RatingBar.builder(
+                                                initialRating: item.rate ?? 3,
+                                                itemCount: 5,
+                                                allowHalfRating: true,
+                                                itemPadding: const EdgeInsets
+                                                    .symmetric(horizontal: 1.0),
+                                                itemBuilder: (context, _) => Icon(
+                                                  Icons.star_rounded,
+                                                  color: CompanyColors.grey
+                                                      .withOpacity(0.7),
+                                                ),
+                                                itemSize: 12,
+                                                onRatingUpdate: (_) {},
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                top: 8,
+                                                bottom: 28,
+                                              ),
+                                              child: Text(
+                                                'IMDb: ${((item.rate ?? 0) * 2)
+                                                    .toString()}',
+                                                style: Theme.of(context).textTheme
+                                                    .titleSmall
+                                                    ?.merge(const TextStyle(
+                                                  color: CompanyColors.grey,
+                                                  fontSize: 9,
+                                                )),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                SizedBox(
+                                                  width: 128,
+                                                  height: 39,
+                                                  child: ElevatedButton(
+                                                      onPressed: () {},
+                                                      child: const Text('Watch now')
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    if (item.isFavorite) {
+                                                      ref.read(
+                                                          myFavoritesProvider
+                                                              .notifier
+                                                      ).removeFavorite(item);
+                                                    } else {
+                                                      ref.read(
+                                                          myFavoritesProvider
+                                                              .notifier
+                                                      ).addFavorite(item);
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    item.isFavorite
+                                                    ? Icons.favorite_rounded
+                                                    : Icons
+                                                      .favorite_border_rounded
+                                                  ),
+                                                  color: CompanyColors.grey,
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 16),
+                                  child: Divider(),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                       ),
                     );
                   },

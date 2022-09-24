@@ -111,7 +111,33 @@ class HomePage extends ConsumerWidget {
       ? SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
+          child: myFavorites.isEmpty
+          ? SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height /2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: const Icon(
+                      Icons.sentiment_dissatisfied_rounded,
+                      size: 96,
+                      color: CompanyColors.grey,
+                    ),
+                  ),
+                  Text(
+                    'No favorites',
+                    style: Theme.of(context).textTheme.titleLarge
+                    ?.merge(const TextStyle(
+                      color: CompanyColors.grey,
+                    )),
+                  )
+                ],
+              ),
+            )
+          : Column(
             children: myFavorites.map((Series item) {
               return Container(
                 margin: const EdgeInsets.only(bottom: 24),

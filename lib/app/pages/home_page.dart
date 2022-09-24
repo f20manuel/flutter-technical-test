@@ -6,9 +6,11 @@ import 'package:fluttertest/app/core/navigation/route_name.dart';
 import 'package:fluttertest/app/core/theme/colors.dart';
 import 'package:fluttertest/app/data/enums/image_width.dart';
 import 'package:fluttertest/app/data/http/http_client.dart';
+import 'package:fluttertest/app/data/models/episode.dart';
 import 'package:fluttertest/app/data/models/series.dart';
 import 'package:fluttertest/app/pages/details_page.dart';
 import 'package:fluttertest/app/pages/popular_series_page.dart';
+import 'package:fluttertest/app/pages/recent_page.dart';
 import 'package:fluttertest/app/widgets/image.dart';
 import 'package:skeletons/skeletons.dart';
 
@@ -66,8 +68,52 @@ final futureRecommendationsProvider = FutureProvider.autoDispose<List<Series>>(
   return series;
 });
 
-/// Get recommendations
-
+/// Get Airing Today
+final futureAiringTodayProvider = FutureProvider.autoDispose<List<Series>>(
+  (ref) async {
+    final Response response = await fetchGet(
+      '/tv/airing_today',
+      parameters: <String, dynamic>{
+        'page': 1,
+      },
+    );
+    final List<Series> series = <Series>[];
+    for (final Map<String, dynamic> json in response.data['results']) {
+      final Response response2 = await fetchGet('/tv/${json['id']}');
+      final Series seriesModel = Series(
+        id: json['id'],
+        backdropPath: json['backdrop_path'],
+        firstAirDate: DateTime.parse(json['first_air_date']),
+        genreIds: json['genre_ids'],
+        name: json['name'],
+        rate: double.parse(json['vote_average'].toString()) / 2,
+      );
+      if (response2.data['seasons'].isNotEmpty) {
+        final Response lastSeason = await fetchGet(
+          '/tv/${json['id']}/season/${
+            response2.data['seasons'].last['season_number']
+          }',
+        );
+        seriesModel.episodesCount = lastSeason.data['episodes'].length;
+        seriesModel.episodes = <Episode>[];
+        for(final Map<String, dynamic> json in lastSeason.data['episodes']) {
+          final Episode episode = Episode(
+            id: json['id'],
+            imagePath: json['still_path'],
+            number: json['episode_number'],
+            name: json['name'],
+            year: int.parse(json['air_date'].split('-')[0]),
+            seasonNumber: json['season_number'],
+            description: json['overview'],
+          );
+          seriesModel.episodes!.add(episode);
+        }
+      }
+      series.add(seriesModel);
+    }
+    return series;
+  }
+);
 
 /// Home page
 class HomePage extends ConsumerWidget {
@@ -80,6 +126,9 @@ class HomePage extends ConsumerWidget {
     final AsyncValue<List<Series>> series = ref.watch(futureSeriesProvider);
     final AsyncValue<List<Series>> recommendations = ref.watch(
       futureSeriesProvider,
+    );
+    final AsyncValue<List<Series>> airingToday = ref.watch(
+      futureAiringTodayProvider,
     );
     return Scaffold(
       appBar: AppBar(
@@ -264,7 +313,86 @@ class HomePage extends ConsumerWidget {
         ),
       )
       : pageIndex == 2
-        ? Container()
+        ? airingToday.when(
+            loading: () => Container(),
+            data: (List<Series> data) => ListView.separated(
+              separatorBuilder: (BuildContext context, int index) =>
+              const Divider(),
+              itemCount: data.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Series item = data[index];
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: AppNetworkImage(
+                            pathWidth: ImageWidth.w400,
+                            path: item.backdropPath,
+                            width: 256,
+                            height: 256,
+                            fit: BoxFit.fitHeight,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          item.name,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          'Episodes ${item.episodesCount}',
+                          style: Theme.of(context).textTheme.titleSmall
+                          ?.merge(const TextStyle(
+                            color: CompanyColors.grey,
+                          )),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              RouteName.detailsRecentSeason,
+                              arguments: RecentArguments(
+                                seriesTitle: item.name,
+                                episodes: item.episodes ?? [],
+                              ),
+                            ),
+                            child: Row(
+                              children: <Widget>[
+                                Text(
+                                  'Go to view',
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.merge(const TextStyle(
+                                    color: CompanyColors.primary,
+                                  )),
+                                ),
+                                const Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: CompanyColors.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }
+            ),
+            error: (err, stack) => Text('Error: $err'),
+          )
         : pageIndex == 3
           ? Container()
           : SingleChildScrollView(

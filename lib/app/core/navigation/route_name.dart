@@ -6,4 +6,5 @@ class RouteName {
   static const String home = '/auth/home';
   static const String popularSeries = '/auth/popular/series';
   static const String detailsSeries = '/auth/series/details';
+  static const String detailsRecentSeason = 'auth/recent/season';
 }

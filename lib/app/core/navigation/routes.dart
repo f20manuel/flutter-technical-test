@@ -4,6 +4,7 @@ import 'package:fluttertest/app/pages/auth_page.dart';
 import 'package:fluttertest/app/pages/details_page.dart';
 import 'package:fluttertest/app/pages/home_page.dart';
 import 'package:fluttertest/app/pages/popular_series_page.dart';
+import 'package:fluttertest/app/pages/recent_page.dart';
 
 /// Routes
 final Map<String, Widget Function(BuildContext)> routes =
@@ -12,4 +13,5 @@ final Map<String, Widget Function(BuildContext)> routes =
   RouteName.home: (_) => const HomePage(),
   RouteName.popularSeries: (_) => const PopularSeriesPage(),
   RouteName.detailsSeries: (_) => const DetailsPage(),
+  RouteName.detailsRecentSeason: (_) => const RecentPage(),
 };

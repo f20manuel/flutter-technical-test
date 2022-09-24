@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertest/app/data/models/episode.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'series.g.dart';
@@ -15,6 +16,7 @@ class Series {
   late double? rate;
   late bool isFavorite;
   late int episodesCount;
+  late List<Episode>? episodes;
 
   /// Series constructor
   Series({
@@ -27,6 +29,7 @@ class Series {
     this.isFavorite = false,
     this.seasons,
     this.episodesCount = 0,
+    this.episodes,
   });
 
   /// Series from json

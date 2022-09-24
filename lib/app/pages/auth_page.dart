@@ -26,7 +26,6 @@ final futurePrincipalSeriesProvider = FutureProvider<Series?>((ref) async {
   );
   final List<Series> series = <Series>[];
   for (final Map<String, dynamic> json in response.data['results']) {
-    print(json);
     final Series seriesModel = Series(
       id: json['id'],
       backdropPath: json['backdrop_path'],

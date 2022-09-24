@@ -7,6 +7,7 @@ import 'package:fluttertest/app/core/theme/colors.dart';
 import 'package:fluttertest/app/data/enums/image_width.dart';
 import 'package:fluttertest/app/data/http/http_client.dart';
 import 'package:fluttertest/app/data/models/series.dart';
+import 'package:fluttertest/app/pages/details_page.dart';
 import 'package:fluttertest/app/pages/popular_series_page.dart';
 import 'package:fluttertest/app/widgets/image.dart';
 import 'package:skeletons/skeletons.dart';
@@ -83,7 +84,13 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Home',
+          pageIndex == 1
+          ? 'Favorites'
+          : pageIndex == 2
+            ? 'Recent'
+            : pageIndex == 3
+              ? 'Search'
+              : 'Home',
           style: Theme.of(context).textTheme.titleSmall
           ?.merge(
             const TextStyle(color: CompanyColors.grey),
@@ -101,7 +108,135 @@ class HomePage extends ConsumerWidget {
         ],
       ),
       body: pageIndex == 1
-      ? Container()
+      ? SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: myFavorites.map((Series item) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: AppNetworkImage(
+                              pathWidth: ImageWidth.w300,
+                              path: item.backdropPath,
+                              width: 150,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            )
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment
+                                  .start,
+                              children: <Widget>[
+                                Text(
+                                  item.name,
+                                  textAlign: TextAlign.start,
+                                  style: Theme.of(context).textTheme
+                                      .titleSmall,
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  child: RatingBar.builder(
+                                    initialRating: item.rate ?? 3,
+                                    itemCount: 5,
+                                    allowHalfRating: true,
+                                    itemPadding: const EdgeInsets
+                                        .symmetric(horizontal: 1.0),
+                                    itemBuilder: (context, _) => Icon(
+                                      Icons.star_rounded,
+                                      color: CompanyColors.grey
+                                          .withOpacity(0.7),
+                                    ),
+                                    itemSize: 12,
+                                    onRatingUpdate: (_) {},
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                    top: 8,
+                                    bottom: 28,
+                                  ),
+                                  child: Text(
+                                    'IMDb: ${((item.rate ?? 0) * 2)
+                                        .toString()}',
+                                    style: Theme.of(context).textTheme
+                                        .titleSmall
+                                        ?.merge(const TextStyle(
+                                      color: CompanyColors.grey,
+                                      fontSize: 9,
+                                    )),
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceBetween,
+                                  children: [
+                                    SizedBox(
+                                      width: 128,
+                                      height: 39,
+                                      child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              RouteName.detailsSeries,
+                                              arguments:
+                                              DetailsArguments(
+                                                series: item,
+                                              ),
+                                            );
+                                          },
+                                          child: const Text('Watch now')
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        if (item.isFavorite) {
+                                          ref.read(
+                                              myFavoritesProvider
+                                                  .notifier
+                                          ).removeFavorite(item);
+                                        } else {
+                                          ref.read(
+                                              myFavoritesProvider
+                                                  .notifier
+                                          ).addFavorite(item);
+                                        }
+                                      },
+                                      icon: Icon(
+                                          item.isFavorite
+                                              ? Icons.favorite_rounded
+                                              : Icons
+                                              .favorite_border_rounded
+                                      ),
+                                      color: CompanyColors.grey,
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Divider(),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      )
       : pageIndex == 2
         ? Container()
         : pageIndex == 3
@@ -239,23 +374,23 @@ class HomePage extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       InkWell(
-                          onTap: () {},
-                          child: Row(
-                            children: <Widget>[
-                              Text(
-                                'See All',
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.merge(const TextStyle(
-                                  color: CompanyColors.primary,
-                                )),
-                              ),
-                              const Icon(
-                                Icons.chevron_right_rounded,
+                        onTap: () {},
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              'See All',
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.merge(const TextStyle(
                                 color: CompanyColors.primary,
-                              ),
-                            ],
-                          )
-                      )
+                              )),
+                            ),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              color: CompanyColors.primary,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -352,8 +487,17 @@ class HomePage extends ConsumerWidget {
                                                   width: 128,
                                                   height: 39,
                                                   child: ElevatedButton(
-                                                      onPressed: () {},
-                                                      child: const Text('Watch now')
+                                                    onPressed: () {
+                                                      Navigator.pushNamed(
+                                                        context,
+                                                        RouteName.detailsSeries,
+                                                        arguments:
+                                                        DetailsArguments(
+                                                          series: item,
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: const Text('Watch now')
                                                   ),
                                                 ),
                                                 IconButton(

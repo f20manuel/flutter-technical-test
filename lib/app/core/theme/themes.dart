@@ -81,7 +81,9 @@ class Themes {
         color: Colors.white,
       ),
     ),
-    dividerColor: CompanyColors.grey,
+    dividerTheme: const DividerThemeData(
+      color: CompanyColors.grey,
+    ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.black,
       unselectedItemColor: Colors.white,

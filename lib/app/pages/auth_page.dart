@@ -26,6 +26,7 @@ final futurePrincipalSeriesProvider = FutureProvider<Series?>((ref) async {
   );
   final List<Series> series = <Series>[];
   for (final Map<String, dynamic> json in response.data['results']) {
+    print(json);
     final Series seriesModel = Series(
       id: json['id'],
       backdropPath: json['backdrop_path'],
@@ -67,15 +68,15 @@ class AuthPage extends ConsumerWidget {
               ),
             ),
             data: (Series? data) => data != null
-                ? AppNetworkImage(
-                    pathWidth: ImageWidth.original,
-                    path: data.backdropPath,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    fit: BoxFit.cover,
-                  )
-                : Container(),
-            error: (err, stack) => Text('Error: $err'),
+              ? AppNetworkImage(
+                  pathWidth: ImageWidth.original,
+                  path: data.backdropPath,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  fit: BoxFit.cover,
+                )
+              : Container(),
+            error: (err, stack) => Text('Error: $err', style: const TextStyle(color: Colors.white)),
           ),
           Container(
             width: MediaQuery.of(context).size.width,

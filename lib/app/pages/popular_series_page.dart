@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertest/app/core/navigation/route_name.dart';
 import 'package:fluttertest/app/core/theme/colors.dart';
 import 'package:fluttertest/app/data/enums/image_width.dart';
 import 'package:fluttertest/app/data/models/series.dart';
+import 'package:fluttertest/app/pages/details_page.dart';
 import 'package:fluttertest/app/widgets/image.dart';
 
 /// Popular series arguments
@@ -108,7 +110,16 @@ class PopularSeriesPage extends ConsumerWidget {
                   width: 128,
                   height: 39,
                   child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          RouteName.detailsSeries,
+                          arguments:
+                          DetailsArguments(
+                            series: args.series,
+                          ),
+                        );
+                      },
                       child: const Text('Watch now')
                   ),
                 ),

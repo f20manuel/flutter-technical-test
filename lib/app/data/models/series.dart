@@ -7,32 +7,34 @@ part 'series.g.dart';
 @JsonSerializable()
 class Series {
   late int id;
-  late String backdropPath;
+  late String? backdropPath;
   late DateTime firstAirDate;
   late List genreIds;
+  late List? seasons;
   late String name;
   late double? rate;
   late bool isFavorite;
+  late int episodesCount;
 
   /// Series constructor
   Series({
     required this.id,
-    required this.backdropPath,
     required this.firstAirDate,
     required this.genreIds,
     required this.name,
+    this.backdropPath,
     this.rate,
     this.isFavorite = false,
+    this.seasons,
+    this.episodesCount = 0,
   });
 
   /// Series from json
-  factory Series.fromJson(Map<String, dynamic> json) =>
-      _$SeriesFromJson(json);
+  factory Series.fromJson(Map<String, dynamic> json) => _$SeriesFromJson(json);
 
   /// Series to json
   Map<String, dynamic> toJson() => _$SeriesToJson(this);
 }
-
 
 class SeriesNotifier extends ChangeNotifier {
   final myFavorites = <Series>[];

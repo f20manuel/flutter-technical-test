@@ -8,11 +8,14 @@ part of 'series.dart';
 
 Series _$SeriesFromJson(Map<String, dynamic> json) => Series(
       id: json['id'] as int,
-      backdropPath: json['backdropPath'] as String,
       firstAirDate: DateTime.parse(json['firstAirDate'] as String),
-      genreIds:
-          (json['genreIds'] as List<dynamic>).map((e) => e as int).toList(),
+      genreIds: json['genreIds'] as List<dynamic>,
       name: json['name'] as String,
+      backdropPath: json['backdropPath'] as String?,
+      rate: (json['rate'] as num?)?.toDouble(),
+      isFavorite: json['isFavorite'] as bool? ?? false,
+      seasons: json['seasons'] as List<dynamic>?,
+      episodesCount: json['episodesCount'] as int,
     );
 
 Map<String, dynamic> _$SeriesToJson(Series instance) => <String, dynamic>{
@@ -20,5 +23,9 @@ Map<String, dynamic> _$SeriesToJson(Series instance) => <String, dynamic>{
       'backdropPath': instance.backdropPath,
       'firstAirDate': instance.firstAirDate.toIso8601String(),
       'genreIds': instance.genreIds,
+      'seasons': instance.seasons,
       'name': instance.name,
+      'rate': instance.rate,
+      'isFavorite': instance.isFavorite,
+      'episodesCount': instance.episodesCount,
     };

@@ -8,15 +8,15 @@ class AppNetworkImage extends StatelessWidget {
   /// App Network Image Constructor
   const AppNetworkImage({
     required this.pathWidth,
-    required this.path,
     Key? key,
+    this.path,
     this.placeholder,
     this.width,
     this.height,
     this.fit,
   }) : super(key: key);
 
-  final String path;
+  final String? path;
   final ImageWidth pathWidth;
   final double? width;
   final double? height;
@@ -25,7 +25,11 @@ class AppNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CachedNetworkImage(
-    imageUrl: '${dotenv.get('IMAGES_BASE_URL')}/${pathWidth.value}$path',
+    imageUrl: path != null
+        ? '${dotenv.get('IMAGES_BASE_URL')}/${pathWidth.value}$path'
+        : 'https://via.placeholder.com/${pathWidth == ImageWidth.original
+        ? '1080x630' : pathWidth.value.split('w')[1]}'
+        '?text=NOT IMAGE',
     placeholder: placeholder,
     width: width,
     height: height,

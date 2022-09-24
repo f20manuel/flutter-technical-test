@@ -108,6 +108,7 @@ class AuthPage extends ConsumerWidget {
                         width: loginShow ? 0 : 128,
                         duration: const Duration(milliseconds: 300),
                         child: ElevatedButton(
+                          key: const Key('log_in_1'),
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                               Colors.white,
@@ -168,6 +169,7 @@ class AuthPage extends ConsumerWidget {
                     child: Column(
                       children: <Widget>[
                         TextFormField(
+                          key: const Key('name_field'),
                           controller: nameController,
                           decoration: const InputDecoration(
                             labelText: 'Name',
@@ -184,6 +186,7 @@ class AuthPage extends ConsumerWidget {
                           },
                         ),
                         TextFormField(
+                          key: const Key('password_field'),
                           controller: passwordController,
                           style: TextStyle(
                             color: Colors.grey.withOpacity(0.5),
@@ -225,6 +228,7 @@ class AuthPage extends ConsumerWidget {
                           width: 128,
                           margin: const EdgeInsets.only(top: 64),
                           child: ElevatedButton(
+                            key: const Key('log_in_2'),
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all(
                                 Colors.white,

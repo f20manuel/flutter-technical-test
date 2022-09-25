@@ -1,10 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertest/app/core/theme/colors.dart';
 import 'package:fluttertest/app/data/enums/image_width.dart';
 import 'package:fluttertest/app/data/models/episode.dart';
-import 'package:fluttertest/app/data/models/series.dart';
 import 'package:fluttertest/app/widgets/image.dart';
 
 /// Recent arguments

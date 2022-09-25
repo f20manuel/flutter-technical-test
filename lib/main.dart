@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Technical Test',
       theme: Themes.mainTheme,
       routes: routes,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

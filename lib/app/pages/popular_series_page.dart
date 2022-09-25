@@ -55,6 +55,22 @@ class PopularSeriesPage extends ConsumerWidget {
           body: Center(
             child: Column(
               children: <Widget>[
+                // Container(
+                //   decoration: const BoxDecoration(
+                //     image: DecorationImage(
+                //       image: NetworkImage(
+                //
+                //       ),
+                //       fit: BoxFit.cover,
+                //     ),
+                //   ),
+                //   child: new BackdropFilter(
+                //     filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                //     child: new Container(
+                //       decoration: new BoxDecoration(color: Colors.white.withOpacity(0.0)),
+                //     ),
+                //   ),
+                // ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   child: ClipRRect(

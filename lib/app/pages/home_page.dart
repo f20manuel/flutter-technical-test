@@ -102,7 +102,7 @@ final futureAiringTodayProvider = FutureProvider.autoDispose<List<Series>>(
             imagePath: json['still_path'],
             number: json['episode_number'],
             name: json['name'],
-            year: int.parse(json['air_date'].split('-')[0]),
+            year: int.parse(json['air_date']?.split('-')[0] ?? '2022'),
             seasonNumber: json['season_number'],
             description: json['overview'],
           );
@@ -314,7 +314,69 @@ class HomePage extends ConsumerWidget {
       )
       : pageIndex == 2
         ? airingToday.when(
-            loading: () => Container(),
+            loading: () => ListView.separated(
+                separatorBuilder: (BuildContext context, int index) =>
+                const Divider(),
+                itemCount: 4,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          width: 256,
+                          height: 256,
+                          child: SkeletonLine(
+                            style: SkeletonLineStyle(
+                              width: 256,
+                              height: 256,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                        Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            width: 256,
+                            height: 34,
+                            child: SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  width: 256,
+                                  height: 34,
+                                  borderRadius: BorderRadius.circular(5),
+                                )
+                            )
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          width: 64,
+                          height: 16,
+                          child: SkeletonLine(
+                            style: SkeletonLineStyle(
+                              width: 64,
+                              height: 16,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  width: 72,
+                                  height: 24,
+                                  borderRadius: BorderRadius.circular(100),
+                                )
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }
+            ),
             data: (List<Series> data) => ListView.separated(
               separatorBuilder: (BuildContext context, int index) =>
               const Divider(),
@@ -414,112 +476,128 @@ class HomePage extends ConsumerWidget {
                   width: MediaQuery.of(context).size.width,
                   height: 320,
                   child: series.when(
-                      loading: () => Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: List.generate(2, (_) =>
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                    right: 16,
-                                    bottom: 8,
-                                  ),
-                                  child: SkeletonLine(
+                    loading: () => Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 4,
+                        separatorBuilder: (BuildContext context, int index) =>
+                            Container(
+                              width: 24,
+                            ),
+                        itemBuilder: (_, int index) => SkeletonItem(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Container(
+                                margin: const EdgeInsets.only(
+                                  right: 16,
+                                  bottom: 8,
+                                ),
+                                child: SkeletonLine(
                                     style: SkeletonLineStyle(
                                       width: 150,
                                       height: 200,
                                       borderRadius: BorderRadius.circular(20),
                                     )
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: SkeletonLine(
+                                  style: SkeletonLineStyle(
+                                    width: 128,
+                                    height: 16,
+                                    borderRadius: BorderRadius.circular(5),
                                   ),
                                 ),
-                                SkeletonLine(
-                                  style: SkeletonLineStyle(
-                                    width: 100,
-                                    height: 18,
-                                    borderRadius: BorderRadius.circular(5),
-                                  )
+                              ),
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  width: 72,
+                                  height: 16,
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      error: (err, stack) => Text('Error: $err'),
-                      data: (List<Series> data) {
-                        return ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          separatorBuilder: (BuildContext context, int index) =>
-                            Container(
-                              width: 24,
+                    ),
+                    error: (err, stack) => Text('Error: $err'),
+                    data: (List<Series> data) {
+                      return ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        separatorBuilder: (BuildContext context, int index) =>
+                          Container(
+                            width: 24,
+                          ),
+                        itemCount: data.length,
+                        padding: const EdgeInsets.all(16),
+                        itemBuilder: (BuildContext context, int index) {
+                          Series item = data[index];
+                          return SizedBox(
+                            width: 150,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                MaterialButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      RouteName.popularSeries,
+                                      arguments: PopularSeriesArguments(
+                                        series: item,
+                                      ),
+                                    );
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: AppNetworkImage(
+                                      pathWidth: ImageWidth.w400,
+                                      path: item.backdropPath,
+                                      width: 150,
+                                      height: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    item.name,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme
+                                        .titleSmall,
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 8),
+                                  child: RatingBar.builder(
+                                    initialRating: item.rate ?? 3,
+                                    itemCount: 5,
+                                    allowHalfRating: true,
+                                    itemPadding: const EdgeInsets
+                                        .symmetric(horizontal: 1.0),
+                                    itemBuilder: (context, _) => Icon(
+                                      Icons.star_rounded,
+                                      color: CompanyColors.grey
+                                          .withOpacity(0.7),
+                                    ),
+                                    itemSize: 12,
+                                    onRatingUpdate: (_) {},
+                                  ),
+                                ),
+                              ],
                             ),
-                          itemCount: data.length,
-                          padding: const EdgeInsets.all(16),
-                          itemBuilder: (BuildContext context, int index) {
-                            Series item = data[index];
-                            return SizedBox(
-                              width: 150,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  MaterialButton(
-                                    onPressed: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteName.popularSeries,
-                                        arguments: PopularSeriesArguments(
-                                          series: item,
-                                        ),
-                                      );
-                                    },
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: AppNetworkImage(
-                                        pathWidth: ImageWidth.w400,
-                                        path: item.backdropPath,
-                                        width: 150,
-                                        height: 200,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      item.name,
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme
-                                          .titleSmall,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 8),
-                                    child: RatingBar.builder(
-                                      initialRating: item.rate ?? 3,
-                                      itemCount: 5,
-                                      allowHalfRating: true,
-                                      itemPadding: const EdgeInsets
-                                          .symmetric(horizontal: 1.0),
-                                      itemBuilder: (context, _) => Icon(
-                                        Icons.star_rounded,
-                                        color: CompanyColors.grey
-                                            .withOpacity(0.7),
-                                      ),
-                                      itemSize: 12,
-                                      onRatingUpdate: (_) {},
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      }
+                          );
+                        },
+                      );
+                    }
                   ),
                 ),
                 Padding(
@@ -565,7 +643,109 @@ class HomePage extends ConsumerWidget {
                   ),
                 ),
                 recommendations.when(
-                  loading: () => Container(),
+                  loading: () => Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SkeletonItem(
+                      child: Column(
+                        children: List<Widget>.generate(
+                            4, (int index) {
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 24),
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  children: <Widget>[
+                                    SkeletonLine(
+                                      style: SkeletonLineStyle(
+                                        width: 150,
+                                        height: 150,
+                                        borderRadius: BorderRadius.circular(
+                                          20,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 16),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment
+                                              .start,
+                                          children: <Widget>[
+                                            SkeletonLine(
+                                              style: SkeletonLineStyle(
+                                                width: MediaQuery.of(context)
+                                                    .size.width,
+                                                height: 16,
+                                                borderRadius: BorderRadius
+                                                    .circular(5),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                top: 8,
+                                              ),
+                                              child: SkeletonLine(
+                                                style: SkeletonLineStyle(
+                                                  width: 72,
+                                                  height: 12,
+                                                  borderRadius: BorderRadius
+                                                      .circular(5),
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                top: 8,
+                                                bottom: 28,
+                                              ),
+                                              child: SkeletonLine(
+                                                style: SkeletonLineStyle(
+                                                  width: 64,
+                                                  height: 9,
+                                                  borderRadius: BorderRadius
+                                                      .circular(5),
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                SkeletonLine(
+                                                  style: SkeletonLineStyle(
+                                                    width: 128,
+                                                    height: 29,
+                                                    borderRadius: BorderRadius
+                                                        .circular(100),
+                                                  ),
+                                                ),
+                                                SkeletonLine(
+                                                  style: SkeletonLineStyle(
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: BorderRadius
+                                                        .circular(100),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 16),
+                                  child: Divider(),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
                   data: (List<Series> data) {
                     return Padding(
                       padding: const EdgeInsets.all(16),

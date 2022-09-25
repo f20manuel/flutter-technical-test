@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertest/app/core/theme/colors.dart';
-import 'package:fluttertest/app/pages/home_page.dart';
 
 /// Themes
 class Themes {

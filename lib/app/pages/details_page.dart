@@ -7,7 +7,6 @@ import 'package:fluttertest/app/data/http/http_client.dart';
 import 'package:fluttertest/app/data/models/episode.dart';
 import 'package:fluttertest/app/data/models/series.dart';
 import 'package:fluttertest/app/widgets/image.dart';
-import 'package:skeletons/skeletons.dart';
 
 /// Details arguments
 class DetailsArguments {
@@ -234,7 +233,7 @@ class DetailsPage extends ConsumerWidget {
                 ),
                 const Divider(),
                 Text(
-                  '${episode.description}',
+                  episode.description,
                   style: Theme.of(context).textTheme.titleSmall
                       ?.merge(const TextStyle(
                     color: CompanyColors.grey,
